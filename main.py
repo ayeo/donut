@@ -2,6 +2,7 @@ import numpy as np
 import math
 import time
 import pygame
+from sympy import Point3D, Plane
 
 radius = 1000
 smallRadius = 300
@@ -37,7 +38,7 @@ for alpha in range(0, 360, 10):
     large_circles = np.vstack((large_circles, [small_circles]))
 
 o = 0
-panes = np.empty((36*18,3,3))
+panes = np.empty((36*18*2,3,3))
 for i in range(0, 36, 1):
     for j in range(0, 18, 1):
         p1 = large_circles[i][j]
@@ -45,6 +46,21 @@ for i in range(0, 36, 1):
         p3 = large_circles[i-1][j]
         panes[o] = [p1, p2, p3]
         o += 1
+
+        p1 = large_circles[i-1][j]
+        p2 = large_circles[i-1][j - 1]
+        p3 = large_circles[i][j-1]
+        panes[o] = [p1, p2, p3]
+        o += 1
+
+def convert(x1, y1, z1):
+    xx = 0.3 * z1 * x1 / z1 + 400
+    yy = 0.3 * z1 * y1 / z1 + 400
+
+    return xx, yy
+
+def klops(u):
+    return u[0][2]
 
 while True:
     for rot in range(0, 360, 1):
@@ -55,34 +71,33 @@ while True:
         screen.fill((0, 0, 0))
 
         angle = math.radians(rot)
+        # extract to variable cos/sin result
         rotateX = np.array([[1, 0, 0], [0, math.cos(angle), -1 * math.sin(angle)], [0, math.sin(angle), math.cos(angle)]])
         rotateY = np.array([[math.cos(angle), 0, math.sin(angle)], [0, 1, 0], [-1 * math.sin(angle), 0, math.cos(angle)]])
         rotateZ = np.array([[math.cos(angle), -1 * math.sin(angle), 0], [math.sin(angle), math.cos(angle), 0], [0, 0, 1]])
 
-        xxx = panes
+        # use vectorized operations to rotate
+        pp = panes.reshape((1944*2, 3))
+        pp = pp.dot(rotateY)
+        pp = pp.dot(rotateX)
+        pp = pp.reshape((648*2, 3, 3))
+        pp = sorted(pp, key=klops)
 
-        for structure in xxx:
-            position = structure[0]
-            position = rotateY.dot(position)
-            position = rotateX.dot(position)
-            x1 = position[0]
-            y1 = position[1]
-            z1 = position[2] + 500
-
-            xx = 0.3 * z1 * x1/z1 + 400
-            yy = 0.3 * z1 * y1/z1 + 400
-
-            cc = 150 + z1/2 - 250
-            # print(cc)
+        for structure in pp:
+            z1 = structure[0][2]
+            cc =  150+z1/8
             if cc > 255:
                 cc = 255
-            if cc < 30:
-                cc = 30
+            if cc < 0:
+                cc = 0
 
             color = (cc, cc, cc)
+            points = [convert(*structure[0]),convert(*structure[1]),convert(*structure[2])]
+            pygame.draw.polygon(screen, (0,0,0), points)
+            (xx, yy) = convert(*structure[0])
             pygame.draw.circle(screen, color, (xx, yy), 2)
 
-        time.sleep(0.01)
+        # time.sleep(0.01)
         pygame.display.flip()
 
 pygame.quit()
