@@ -37,18 +37,12 @@ for alpha in range(0, 360, 10):
     large_circles = np.vstack((large_circles, [small_circles]))
 
 o = 0
-panes = np.empty((648*2,3,3))
-for i in range(1, 35, 1):
-    for j in range(1, 17, 1):
+panes = np.empty((36*18,3,3))
+for i in range(0, 36, 1):
+    for j in range(0, 18, 1):
         p1 = large_circles[i][j]
         p2 = large_circles[i][j-1]
         p3 = large_circles[i-1][j]
-        panes[o] = [p1, p2, p3]
-        o += 1
-
-        p1 = large_circles[i-1][j]
-        p2 = large_circles[i-1][j - 1]
-        p3 = large_circles[i][j-1]
         panes[o] = [p1, p2, p3]
         o += 1
 
@@ -65,26 +59,28 @@ while True:
         rotateY = np.array([[math.cos(angle), 0, math.sin(angle)], [0, 1, 0], [-1 * math.sin(angle), 0, math.cos(angle)]])
         rotateZ = np.array([[math.cos(angle), -1 * math.sin(angle), 0], [math.sin(angle), math.cos(angle), 0], [0, 0, 1]])
 
-        for structure in large_circles:
-            for position in structure:
-                position = rotateY.dot(position)
-                position = rotateX.dot(position)
-                x1 = position[0]
-                y1 = position[1]
-                z1 = position[2] + 500
+        xxx = panes
 
-                xx = 0.3 * z1 * x1/z1 + 400
-                yy = 0.3 * z1 * y1/z1 + 400
+        for structure in xxx:
+            position = structure[0]
+            position = rotateY.dot(position)
+            position = rotateX.dot(position)
+            x1 = position[0]
+            y1 = position[1]
+            z1 = position[2] + 500
 
-                cc = 150 + z1/2 - 250
-                # print(cc)
-                if cc > 255:
-                    cc = 255
-                if cc < 30:
-                    cc = 30
+            xx = 0.3 * z1 * x1/z1 + 400
+            yy = 0.3 * z1 * y1/z1 + 400
 
-                color = (cc, cc, cc)
-                pygame.draw.circle(screen, color, (xx, yy), 2)
+            cc = 150 + z1/2 - 250
+            # print(cc)
+            if cc > 255:
+                cc = 255
+            if cc < 30:
+                cc = 30
+
+            color = (cc, cc, cc)
+            pygame.draw.circle(screen, color, (xx, yy), 2)
 
         time.sleep(0.01)
         pygame.display.flip()
