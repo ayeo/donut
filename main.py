@@ -36,6 +36,22 @@ for alpha in range(0, 360, 10):
 
     large_circles = np.vstack((large_circles, [small_circles]))
 
+o = 0
+panes = np.empty((648*2,3,3))
+for i in range(1, 35, 1):
+    for j in range(1, 17, 1):
+        p1 = large_circles[i][j]
+        p2 = large_circles[i][j-1]
+        p3 = large_circles[i-1][j]
+        panes[o] = [p1, p2, p3]
+        o += 1
+
+        p1 = large_circles[i-1][j]
+        p2 = large_circles[i-1][j - 1]
+        p3 = large_circles[i][j-1]
+        panes[o] = [p1, p2, p3]
+        o += 1
+
 while True:
     for rot in range(0, 360, 1):
         for event in pygame.event.get():
