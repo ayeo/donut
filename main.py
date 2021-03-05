@@ -2,16 +2,12 @@ import numpy as np
 import math
 import time
 import pygame
-from sympy import Point3D, Plane
 
 radius = 1000
 smallRadius = 300
 
 pygame.init()
 screen = pygame.display.set_mode([800, 800])
-
-# structure = np.empty((0,3))
-
 
 large_circles = np.empty((0,18,3))
 for alpha in range(0, 360, 10):
@@ -76,7 +72,6 @@ while True:
         rotateY = np.array([[math.cos(angle), 0, math.sin(angle)], [0, 1, 0], [-1 * math.sin(angle), 0, math.cos(angle)]])
         rotateZ = np.array([[math.cos(angle), -1 * math.sin(angle), 0], [math.sin(angle), math.cos(angle), 0], [0, 0, 1]])
 
-        # use vectorized operations to rotate
         pp = panes.reshape((1944*2, 3))
         pp = pp.dot(rotateY)
         pp = pp.dot(rotateX)
